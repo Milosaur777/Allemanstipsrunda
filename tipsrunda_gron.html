@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naturtipset, Grön ledtråd</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: green;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: white;
+        }
+        td, th {
+            width: 30px;
+            height: 50px;
+            text-align: center;
+            border: 1px solid black;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        th {
+            background-color: darkgray;
+            color: white;
+        }
+        .selected {
+            background-color: lightgray;
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+        }
+        .correct {
+            background-color: green;
+            color: white;
+        }
+        .incorrect {
+            background-color: red;
+            color: white;
+        }
+        .black-cell {
+            background-color: black;
+        }
+        .hidden {
+            display: none;
+        }
+        .popup {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px;
+            border: 2px solid black;
+            font-size: 18px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: white;">Naturtipset, Grön ledtråd</h1>
+    <div class="popup" id="countdownPopup">Vänta: <span id="countdown">5</span>s</div>
+    <table>
+        <thead>
+            <tr>
+                <th></th><th>1</th><th></th><th>X</th><th></th><th>2</th><th></th><th></th>
+            </tr>
+        </thead>
+        <tbody id="quizBody">
+            <script>
+                const answers = ["2", "2", "1", "X", "1", "X", "1", "2", "X", "2", "1"];
+                for (let i = 0; i < 11; i++) {
+                    document.write(`<tr>
+                        <td class="black-cell"></td>
+                        <td onclick="selectCell(this)"></td>
+                        <td class="black-cell"></td>
+                        <td onclick="selectCell(this)"></td>
+                        <td class="black-cell"></td>
+                        <td onclick="selectCell(this)"></td>
+                        <td class="black-cell"></td>
+                        <td class="black-cell"></td>
+                    </tr>`);
+                }
+            </script>
+        </tbody>
+    </table>
+    <button id="klarButton" onclick="checkAnswers()" style="background-color: green; color: white; padding: 10px; font-size: 16px; cursor: pointer;">KLAR</button>
+
+    <script>
+        function selectCell(cell) {
+            let row = cell.parentElement;
+            for (let c of row.children) {
+                if (c.cellIndex % 2 === 1) {
+                    c.classList.remove("selected");
+                    c.textContent = "";
+                }
+            }
+            cell.classList.add("selected");
+            cell.textContent = "X";
+        }
+
+        function checkAnswers() {
+            let rows = document.querySelectorAll("tbody tr");
+            let allCorrect = true;
+            let incorrectCells = [];
+            
+            rows.forEach((row, i) => {
+                if (i < 11) {
+                    let cells = row.children;
+                    let selectedCell = Array.from(cells).find(cell => cell.classList.contains("selected"));
+                    if (selectedCell) {
+                        let selectedIndex = Array.from(cells).indexOf(selectedCell);
+                        if (["", "1", "", "X", "", "2", "", ""][selectedIndex] === answers[i]) {
+                            selectedCell.classList.add("correct");
+                        } else {
+                            selectedCell.classList.add("incorrect");
+                            incorrectCells.push(selectedCell);
+                            allCorrect = false;
+                        }
+                    }
+                }
+            });
+            
+            if (allCorrect) {
+                document.getElementById("klarButton").style.display = "none";
+                expandTable();
+            } else {
+                let countdown = 5;
+                document.getElementById("countdown").textContent = countdown;
+                document.getElementById("countdownPopup").style.display = "block";
+                let interval = setInterval(() => {
+                    countdown--;
+                    document.getElementById("countdown").textContent = countdown;
+                    if (countdown === 0) {
+                        clearInterval(interval);
+                        document.getElementById("countdownPopup").style.display = "none";
+                        incorrectCells.forEach(cell => {
+                            cell.classList.remove("incorrect", "selected");
+                            cell.textContent = "";
+                        });
+                    }
+                }, 1000);
+            }
+        }
+
+        function expandTable() {
+            let table = document.getElementById("quizBody");
+            let newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td><strong>TOTALT:</strong></td>
+                <td><input type="text" class="result-input" id="finalAnswer"></td>
+                <td>+</td>
+                <td><input type="text" class="result-input"></td>
+                <td>-</td>
+                <td><input type="text" class="result-input"></td>
+                <td>=</td>
+                <td><input type="text" class="result-input" style="background-color: white; color: black;" oninput="checkFinalAnswer()"></td>
+            `;
+            table.appendChild(newRow);
+        }
+        
+        function checkFinalAnswer() {
+            let finalInput = document.getElementById("finalAnswer").value;
+            if (finalInput === "3") {
+                document.body.innerHTML = "<div style='font-size: 100px; font-weight: bold; color: white; background-color: blue; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center;'>5</div>";
+            }
+        }
+    </script>
+</body>
+</html>

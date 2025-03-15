@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huvudsida - Natur Tipsrundan</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .game-button {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            color: white;
+        }
+        .blue { background-color: blue; }
+        .green { background-color: green; }
+        .yellow { background-color: gold; }
+        .red { background-color: red; }
+        .white { background-color: gray; }
+    </style>
+</head>
+<body>
+    <h1>Välj din Tipsrunda!</h1>
+    <div class="button-container">
+        <button class="game-button blue" onclick="location.href='tipsrunda_bla.html'">Blå Ledtråd</button>
+        <button class="game-button green" onclick="location.href='tipsrunda_gron.html'">Grön Ledtråd</button>
+        <button class="game-button yellow" onclick="location.href='tipsrunda_gul.html'">Gul Ledtråd</button>
+        <button class="game-button red" onclick="location.href='tipsrunda_rod.html'">Röd Ledtråd</button>
+        <button class="game-button white" onclick="location.href='tipsrunda_vit.html'">Vit Ledtråd</button>
+    </div>
+</body>
+</html>
+
+<!-- Generera individuella tipsrundor med olika färg och svar -->
+
+<script>
+    const rounds = {
+        "bla": { color: "blue", answers: ["X", "1", "2", "X", "1", "1", "2", "X", "X", "1", "2"] },
+        "gron": { color: "green", answers: ["2", "2", "1", "X", "1", "X", "1", "2", "X", "2", "1"] },
+        "gul": { color: "gold", answers: ["1", "2", "X", "X", "1", "1", "2", "1", "X", "X", "1"] },
+        "rod": { color: "red", answers: ["X", "1", "2", "X", "1", "1", "2", "X", "X", "1", "2"] },
+        "vit": { color: "gray", answers: ["2", "2", "1", "X", "1", "X", "1", "2", "X", "2", "1"] }
+    };
+
+    for (let key in rounds) {
+        let round = rounds[key];
+        let page = `<!DOCTYPE html>
+<html lang='sv'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>${key.charAt(0).toUpperCase() + key.slice(1)} Hemligheten</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        .answer-box { width: 50px; height: 50px; background-color: ${round.color}; color: white; text-align: center; line-height: 50px; font-weight: bold; }
+        table { border-collapse: collapse; margin: 20px auto; }
+        td, th { width: 50px; height: 50px; text-align: center; border: 1px solid black; cursor: pointer; }
+        .selected { background-color: lightgray; }
+        .correct { background-color: green; }
+        .incorrect { background-color: red; }
+    </style>
+</head>
+<body>
+    <h1 style='color: ${round.color};'>${key.charAt(0).toUpperCase() + key.slice(1)} Hemligheten</h1>
+    <table>
+        <thead>
+            <tr><th>1</th><th>X</th><th>2</th></tr>
+        </thead>
+        <tbody>
+            ${round.answers.map(() => "<tr><td></td><td></td><td></td></tr>").join('')}
+            <tr>
+                <td><strong>TOTALT:</strong></td>
+                <td><input type='text' class='result-input'></td>
+                <td>+</td>
+                <td><input type='text' class='result-input'></td>
+                <td>-</td>
+                <td><input type='text' class='result-input'></td>
+                <td>=</td>
+                <td class='answer-box'></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>`;
+        
+        let blob = new Blob([page], { type: "text/html" });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = `tipsrunda_${key}.html`;
+        a.click();
+    }
+</script>
